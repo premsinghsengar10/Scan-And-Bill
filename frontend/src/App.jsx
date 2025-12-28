@@ -316,6 +316,7 @@ function App() {
             <header className="mb-12 text-left">
                 <h1>SCAN&BILL</h1>
                 <p className="text-gray-400 text-sm font-medium">Self-Checkout Point</p>
+                <p className="text-[10px] text-gray-300 font-bold tracking-tighter mt-2 uppercase">BY PREM SINGH SENGAR & ANTIGRAVITY</p>
             </header>
 
             <AnimatePresence>

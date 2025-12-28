@@ -65,4 +65,4 @@ Scan & Bill is a modern, web-based self-checkout application designed to streaml
 
 ---
 
-Built with ❤️ by [Antigravity](https://google.com)
+Built with ❤️ by **Prem Singh Sengar** and **Antigravity**

@@ -75,4 +75,8 @@ public class OrderService {
 
         return savedOrder;
     }
+
+    public List<Order> getOrdersByStoreId(String storeId) {
+        return orderRepository.findByStoreId(storeId);
+    }
 }

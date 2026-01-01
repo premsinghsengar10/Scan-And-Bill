@@ -22,6 +22,10 @@ public class Product {
     private double basePrice;
     private String storeId;
 
+    // Admin Fields
+    private double taxRate; // Percentage (e.g., 18.0)
+    private double costPrice; // For profit calculation
+
     @Version
     private Long version;
 }

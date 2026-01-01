@@ -55,7 +55,7 @@ public class DataSeeder implements CommandLineRunner {
                                 String barcode = prefix + String.format("%03d", i);
                                 products.add(new Product(null, barcode, config[0] + " Premium Item " + i,
                                                 20.0 + (i * 10), category, getImageUrl(category), 10.0 + (i * 5),
-                                                store.getId(), null));
+                                                store.getId(), 18.0, 10.0 + (i * 5), null));
                         }
                         productRepository.saveAll(products);
 

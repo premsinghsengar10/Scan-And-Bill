@@ -8,6 +8,8 @@ import InventorySelector from '../components/InventorySelector';
 import CartView from '../components/CartView';
 import HistoryView from '../components/HistoryView';
 
+import AdminDashboard from './AdminDashboard';
+
 const Dashboard = ({ user, handleLogout, cart, orders, fetchCart, fetchOrders, activeTab, setActiveTab, handleAdd, handleRemove, handleCheckout, checkoutDetails, setCheckoutDetails, addToast }) => {
     const [stores, setStores] = useState([]);
     const [adminProducts, setAdminProducts] = useState([]);
@@ -15,6 +17,7 @@ const Dashboard = ({ user, handleLogout, cart, orders, fetchCart, fetchOrders, a
     const [showProductModal, setShowProductModal] = useState(false);
     const [storeForm, setStoreForm] = useState({ name: '', location: '', adminUsername: '', adminPassword: '' });
     const [productForm, setProductForm] = useState({ barcode: '', name: '', price: '', category: 'Electronics', imageUrl: '', basePrice: '', initialStock: 10 });
+    const [selectedStoreId, setSelectedStoreId] = useState(null);
 
     useEffect(() => {
         if (user.role === 'SUPER_ADMIN' && activeTab === 'admin') {
@@ -23,6 +26,8 @@ const Dashboard = ({ user, handleLogout, cart, orders, fetchCart, fetchOrders, a
             fetchAdminProducts();
         }
     }, [user, activeTab]);
+
+    // ... existing fetching logic ...
 
     const fetchStores = async () => {
         try {
@@ -37,6 +42,8 @@ const Dashboard = ({ user, handleLogout, cart, orders, fetchCart, fetchOrders, a
             setAdminProducts(res.data);
         } catch (err) { }
     };
+
+    // ... handleCreateStore, handleAddProduct ...
 
     const handleCreateStore = async () => {
         try {
@@ -69,7 +76,10 @@ const Dashboard = ({ user, handleLogout, cart, orders, fetchCart, fetchOrders, a
                 user={user}
                 cart={cart}
                 activeTab={activeTab}
-                setActiveTab={setActiveTab}
+                setActiveTab={(tab) => {
+                    setActiveTab(tab);
+                    if (tab === 'admin') setSelectedStoreId(null); // Reset when switching tabs
+                }}
                 handleLogout={handleLogout}
             />
 
@@ -77,36 +87,46 @@ const Dashboard = ({ user, handleLogout, cart, orders, fetchCart, fetchOrders, a
                 <AnimatePresence mode="wait">
                     {user.role === 'SUPER_ADMIN' ? (
                         activeTab === 'admin' && (
-                            <div className="max-w-4xl mx-auto py-10 px-6">
-                                <div className="flex justify-between items-end mb-16">
-                                    <div>
-                                        <h1 className="text-5xl font-black">Ecosystem</h1>
-                                        <p className="text-gray-400 text-xs font-bold uppercase tracking-[0.3em] mt-2">Active Node Infrastructure</p>
-                                    </div>
-                                    <button onClick={() => setShowStoreModal(true)} className="py-4 px-8 rounded-2xl flex items-center gap-3">
-                                        <Plus size={18} /> Provision Store
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                    {stores.map(store => (
-                                        <div key={store.id} className="glass-card p-12 bg-white rounded-[40px] border border-gray-50 flex flex-col items-center text-center">
-                                            <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-6">
-                                                <Store className="text-black" size={32} />
-                                            </div>
-                                            <h3 className="text-xl font-black tracking-tight mb-2">{store.name}</h3>
-                                            <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-6">{store.location}</p>
-                                            <div className="flex gap-4 w-full">
-                                                <button className="flex-1 py-3 px-0 bg-gray-50 text-black text-[10px] uppercase font-black tracking-widest rounded-xl hover:bg-black hover:text-white transition-all shadow-none">Inspect</button>
-                                                <button className="flex-1 py-3 px-0 bg-red-50 text-red-600 text-[10px] uppercase font-black tracking-widest rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-none border-none">Decommission</button>
-                                            </div>
+                            selectedStoreId ? (
+                                <AdminDashboard
+                                    user={user}
+                                    storeId={selectedStoreId}
+                                    onBack={() => setSelectedStoreId(null)}
+                                    handleLogout={handleLogout}
+                                    addToast={addToast}
+                                />
+                            ) : (
+                                <div className="max-w-4xl mx-auto py-10 px-6">
+                                    <div className="flex justify-between items-end mb-16">
+                                        <div>
+                                            <h1 className="text-5xl font-black">Ecosystem</h1>
+                                            <p className="text-gray-400 text-xs font-bold uppercase tracking-[0.3em] mt-2">Active Node Infrastructure</p>
                                         </div>
-                                    ))}
-                                    <div onClick={() => setShowStoreModal(true)} className="glass-card p-12 bg-white/50 rounded-[40px] border border-dashed border-gray-100 flex flex-col items-center justify-center text-center h-[320px] cursor-pointer hover:bg-gray-50 transition-all">
-                                        <Plus className="text-gray-300 mb-4" size={48} />
-                                        <p className="text-gray-300 font-bold uppercase tracking-[0.2em] text-[10px]">Add New Node Infrastructure</p>
+                                        <button onClick={() => setShowStoreModal(true)} className="py-4 px-8 rounded-2xl flex items-center gap-3">
+                                            <Plus size={18} /> Provision Store
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                        {stores.map(store => (
+                                            <div key={store.id} className="glass-card p-12 bg-white rounded-[40px] border border-gray-50 flex flex-col items-center text-center">
+                                                <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-6">
+                                                    <Store className="text-black" size={32} />
+                                                </div>
+                                                <h3 className="text-xl font-black tracking-tight mb-2">{store.name}</h3>
+                                                <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-6">{store.location}</p>
+                                                <div className="flex gap-4 w-full">
+                                                    <button onClick={() => setSelectedStoreId(store.id)} className="flex-1 py-3 px-0 bg-gray-50 text-black text-[10px] uppercase font-black tracking-widest rounded-xl hover:bg-black hover:text-white transition-all shadow-none">Inspect</button>
+                                                    <button className="flex-1 py-3 px-0 bg-red-50 text-red-600 text-[10px] uppercase font-black tracking-widest rounded-xl hover:bg-red-600 hover:text-white transition-all shadow-none border-none">Decommission</button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <div onClick={() => setShowStoreModal(true)} className="glass-card p-12 bg-white/50 rounded-[40px] border border-dashed border-gray-100 flex flex-col items-center justify-center text-center h-[320px] cursor-pointer hover:bg-gray-50 transition-all">
+                                            <Plus className="text-gray-300 mb-4" size={48} />
+                                            <p className="text-gray-300 font-bold uppercase tracking-[0.2em] text-[10px]">Add New Node Infrastructure</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )
                         )
                     ) : (
                         <>

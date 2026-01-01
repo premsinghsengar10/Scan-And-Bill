@@ -22,6 +22,8 @@ import LoginView from './pages/LoginView';
 import SignupView from './pages/SignupView';
 import Dashboard from './pages/Dashboard';
 
+import AdminDashboard from './pages/AdminDashboard'; // Import
+
 function App() {
     const [user, setUser] = useState(null);
     const [activeTab, setActiveTab] = useState('scan');
@@ -136,6 +138,7 @@ function App() {
         }
     };
 
+
     return (
         <BrowserRouter>
             <AnimatePresence>
@@ -143,8 +146,16 @@ function App() {
             </AnimatePresence>
 
             <Routes>
-                <Route path="/login" element={!user ? <LoginView onLogin={handleLogin} /> : <Navigate to="/" />} />
+                <Route path="/login" element={!user ? <LoginView onLogin={handleLogin} /> : <Navigate to={user.role === 'ADMIN' || user.role === 'SUPER_ADMIN' ? "/admin" : "/"} />} />
                 <Route path="/signup" element={!user ? <SignupView onSignup={() => addToast("Store Registered Successfully")} /> : <Navigate to="/" />} />
+
+                {/* Admin Route */}
+                <Route path="/admin" element={user && (user.role === 'ADMIN' || user.role === 'SUPER_ADMIN') ?
+                    <AdminDashboard user={user} handleLogout={handleLogout} addToast={addToast} />
+                    : <Navigate to="/" />
+                } />
+
+                {/* Customer Route */}
                 <Route path="/" element={user ?
                     <Dashboard
                         user={user}

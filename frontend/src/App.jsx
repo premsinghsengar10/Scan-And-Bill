@@ -33,6 +33,12 @@ function App() {
     const [showSecurityGate, setShowSecurityGate] = useState(false);
 
     useEffect(() => {
+        // Critical Check: Ensure API URL is set in Production
+        if (import.meta.env.PROD && !axios.defaults.baseURL) {
+            addToast("CRITICAL: Backend URL missing! Check Netlify Settings.", "error");
+            console.error("VITE_API_BASE_URL is missing. API calls will fail.");
+        }
+
         const savedUser = sessionStorage.getItem('user');
         if (savedUser) setUser(JSON.parse(savedUser));
     }, []);
